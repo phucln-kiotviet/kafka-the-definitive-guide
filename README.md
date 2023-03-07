@@ -22,3 +22,18 @@
 ```
 I thought that since Kafka was a system optimized for writing, using a writer’s name would make sense. I had taken a lot of lit classes in college and liked Franz Kafka. Plus the name sounded cool for an open source project. So basically there is not much of a relationship.
 ```
+
+## Chapter 2 Installing Kafka
+
+- As figure 2-1: (page 41):
+
+    - `Broker` store broker and topic metadata to Zookeeper
+
+    - `Consume` store consumer metadata and `partition offsets` to Zookeeper
+
+- Create vagrant to setup: 
+
+```sh
+vagrant init ubuntu/focal64
+```
+
