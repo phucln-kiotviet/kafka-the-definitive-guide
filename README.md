@@ -112,3 +112,64 @@ docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' zook
 ### Colocating Applications on Zookeeper
 - Kafka use Zookeeper for storing metadata information about: brokers, topics, and partitions.
 - Consumer can use Kafka or Zookeeper for storing offset.
+
+
+
+## Chapter 3 Kafka Producers: Writing Messages to Kafka
+
+- Figure 3-1. High-level overview of Kafka producer components. Page 66.
+    - Producer: Create `ProducerRecord` which must include: topic and value
+    - `ProducerRecord`: May be include [key], [partition]
+    - Sau do Producer se `serialize` key va value thanh ByteArrays de gui qua mang.
+    - Sau do data duoc gui toi `Partitioner`: Neu chi ro partition trong ProducerRecord thi partitioner se ko lam gi. Neu ko chi ro partitioner se chon partion thuong dua tren ProducerRecord `key`. Cuoi cung producer biet data gui vao partition nao. Luc nay producer se gui batches theo topic, partition toi broker.
+    - Neu data ghi vao broker thanh cong producer se nhan ve `RecordMetadata`. Neu ko se nhan ve error va producer se thu ghi vai lan truoc khi tu bo :D
+
+- Constructing a kafka Producer:
+    - `bootstrap.servers`: list of `host:port` of brokers. Ko can tat ca vi Producer se lay them thong tin sau khi thiet lap ket noi. Nhung khuyen nghi la 2 trong truong hop 1 broker bi down se con broker khac backup.
+    - `key.serializer`:  ????
+    - `value.serializer`: ????
+
+- Method send message:
+    - Fire and forget: Sent and don't really care if it arrives or not
+    - Synchronous send: Sent and wait to check if was success or not
+    - Asynchronous send: Sent with callback function, which will triggered when it received response from broker
+
+### Configuring Producers
+- Some configuration:
+    - `acks`: Bao nhieu partition replicas phai nhan truoc khi producer coi la ghi thanh cong.
+        - acks=0: Producer khong cho response to broker. -> Producer ko biet message gui thanh cong hay khong nhung cung gui nhanh nhat co the ( mien mang support).
+        - acks=1: Cho 1 success response. Throughput depend on method send: synchronously or asynchronously. Synchronously will increase latency. asynchronously will hidden latency but throughput still limited by number of in-flight messages.
+        - acks=all: Can nhan confirm success tu broker khi tat ca da nhan duoc message
+
+    - `buffer.memory`: Amount of memory the producer will be use to buffer message waiting to be sent to brokers. Neu message duoc tao ra tu app nhanh hon bang thong network producer co the out of space.
+
+    - `compression.type`: default message are sent uncompressed. Should use `snappy` invented by Google when performance and bandwidth are concern. Gzip use more CPU but better comprression ratios, recommended when use in cases network and bandwidth is more restricted. 
+
+    - `retries`: default wait 100ms between retries. But we can set `retry.backoff.ms` to control. Thoi gian retry nen duoc test voi thoi gian partition nhan leaders moi.
+
+    - `batch.size`: Producer batch message cung nhau. Producer ko cho batch full moi send. Do do batche loi khong lam cham viec gui message, chi lam su dung nhieu memory cho batch. Set batch qua nho se lam Producer gui message thuong xuyen hon.
+
+    - `linger.ms`: kiem soat thoi gian cho message truoc khi send batch hien tai. Producer send batch khi batch full hoac `linger.ms` dat nguong.
+
+    - `client.id`: just a string
+    - `max.in.flight.requests.per.connection`: Bao nhieu message producer se gui den broker ma ko nhan duoc response. Gia tri cao tang su dung memory nhung cung tang throughput. Cao qua cung giam throughput khi batch kem hieu qua. Set 1 se dam bao ghi message vao broker tuan tu.
+
+    - `timeout.ms, request.timeout.ms, and metadata.fetch.timeout.ms`: 
+    - `max.block.ms`: Control bao lau producer se block viec gui message.
+    - `max.request.size`: size of request Producer will sent ( batch size). nen match voi `message.max.bytes`: size lon nhat broker chap nhan.
+
+### Serializers
+- Serializer: Là việc chuyển dữ liệu trên bộ nhớ Heap thành mảng byte để truyền qua mạng
+- Custom Serializers: 
+
+### Partition
+
+- Kafka message are key-value. ProducerRecord gom topic name, key, va value. Key co the set null. Key cho 2 muc dich:
+    - Key dung de luu message vao partition nao. key null se ghi vao default partion.
+    - La thong tin them voi message duoc luu.
+- Key null va default partitioner duoc su dung, message duoc luu vao partition available mot cach random. 
+- So luong partion cua mot topic ko doi. Thi 1 key luon duoc luu vao mot partition nhat dinh. Dieu nay ko con duoc dam bao khi so luong partition trong topic thay doi.
+
+- Implementing a custom partitioning strategy.
+
+## Chapter 4 Kafka consumers: Reading Data from Kafka
