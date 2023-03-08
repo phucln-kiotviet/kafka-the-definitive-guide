@@ -104,4 +104,11 @@ docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' zook
     - `disk`: outside of select device hardware, or configuration RAID. Filesystem has next largest impact on performance. EXT4 or XFS
 
 ### Production concerns
-- 
+- Garbage collector options:
+
+### Datacenter layout
+- Do not place brokers on the same rack, network, power and failed will take down all.
+
+### Colocating Applications on Zookeeper
+- Kafka use Zookeeper for storing metadata information about: brokers, topics, and partitions.
+- Consumer can use Kafka or Zookeeper for storing offset.
