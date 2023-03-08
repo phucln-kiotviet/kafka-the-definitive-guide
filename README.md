@@ -69,4 +69,39 @@ docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' zook
             - Neu gui message vao partitions theo keys. Them partitions sau do se rat kho khan. Vay nen tinh toan throughput dua tren tuong lai ko phai hien tai.
             - Xem xet so luong partitions tren moi broker voi luong o dia ( disk) va bang thong mang ( network bandwidth) tren moi broker
         - Example partions: Neu muon throughput 1GB/s. Neu moi consumer xu ly 50MB/s. -> Chung ta can it nhat 20 partitions va 20 consumers de co the doc, ghi 1GB/s.
-        - 
+        - `log.retention.ms`: don vi thoi gian nho nhat. Neu ca `.minutes` va `.hours` va `.ms` cung duoc cau hinh, `.ms` se duoc uu tien.
+        - `log.retention.minutes`: 
+        - `log.retention.hours`: default 168 hours or one week.
+        - `log.retention.bytes`: this config per partition. Example 1 topic has 8 partitions and `log.retention.bytes` is 1 GB. So amount of data retained for topic will be 8GB. 
+        - Neu ca `log.retention.ms` va `log.retention.bytes` duoc set. 1 trong 2 cau hinh du dieu kien message se bi xoa.
+        - `log.segment.bytes`: Default 1GB. log segment dong, `log.retention.ms` moi bat dau hieu luc.
+        - `log.segment.ms`: whichever come first Kafka will close a log segment.
+        - Disk performance when using time-based segments: Khi dung time base co the xay ra tinh trang nhieu partition ko bao gio dat nguong limit size ( do cau hinh time ngan) va nhieu segment cung start mot thoi diem.
+
+        - `message.max.bytes`: Default 1MB. Lon hon se bi reject
+        - `message.max.bytes` can duoc xem set khi cau hinh vi anh huong den: `fetch.message.max` cau hinh lien quan xu ly phia consumer, tuong tu: `replica.fetch.max.bytes` tren cac broker khi cau hinh cluster
+### Hardware selection
+
+- Selecting an appropriate hardware configuration for a Kafka broker can be more art than science :v
+- `Disk throughput`: hieu suat producer anh huong boi disk throughput cua broker. SSD thi ngon :D, HDD thi kinh te va co the cau hinh RAID de tang hieu nang.
+- `Disk Capacity`: nen thua 10% so voi nhu cau su dung, 10% nay dung cho cac file khac.
+- `Memory`: Khong nen share kafka voi phan mem khac cung can su dung `page cache`. Dieu nay lam giam performance cua consumer.
+- `Networking`:  Bao gom ca write ( producer) , doc ( consumer) va replicate ( cluster)
+- `CPU`: CPU ko qua yeu cau cao nhu disk va memory. Message duoc nen de toi uu network va disk. Kafka broker sau do phai giai nen va validate `checksum` va gan `offset`. Sau do can nen lai mot lan nua de ghi vao disk. Day la luc chinh Kafka can CPU. Nhung thuong ko qua cao nhu disk va network.
+
+- `Kafka Cloud`: Nen bat dau xem set tu: `data retention` theo sau la performance cua producer. Neu yeu cau do tre ( latency) la rat thap thi co the xem set SSD, neu ko co the dung vi du AWS EBS. Cuoi cung moi la CPU, memory
+
+
+### Kafka Cluster
+- This section is about config Kafka cluster. Fore more detail replication of data see `Chapter 6`.
+- Figure 2-2 A simple Kafka cluster.
+- `How many brokers`: Normal it depended on retaining message( how much storage is availabl). Retain 10TB and each broker avai 2TB -> minium is 5 broker. If replication -> will increase at least 100% = 10 broker. 1 nhan to khac can xem xet den la bang thong mang.
+- `Broker configuration`: 2 tham so bat buoc khi broker join vao mot cluster:
+    - `zookeeper.connect`: Zookeeper cluster va path noi luu metadata phai giong nhau.
+    - `broker.id`: ID phai unique.
+- `OS Tuning`: place: `/etc/sysctl.conf`
+    - `Virtual memory`: 
+    - `disk`: outside of select device hardware, or configuration RAID. Filesystem has next largest impact on performance. EXT4 or XFS
+
+### Production concerns
+- 
