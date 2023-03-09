@@ -237,5 +237,43 @@ docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' zook
 
 
 ## Chapter 5 kafka internals
+- `Cluster Membership`: Kafka use Zookeeper to maintain the list of brokers that are currently member of a cluster. Kafka version moi dang chay `Raft` thay vi zookeeper de handle cac viec do Zookeeper lam.
+- `Controller`: 
+    - la mot broker binh thuong, ngoai ra chiu them trach nhiem cho viec binh bau leader. Broker dau tien start se tro thanh controller. Va tao mot ephemeral node tren Zookeeper goi `/controller`. Cac broker khac start se biet controller da ton tai va tao `Zookeeper watch` de nhan notfied cua node nay.
+    - Khi controller down hay lost connect. Cac broker se nhan ra va dang ky lam controller. Broker nao dang ky dau tien se tro thanh controller.
+    - Broker tro thanh controller se nhan `controller epoch` cao hon broker cu vua down. Khi controller cu online. Cac broker khac se biet de bo qua no.
+    - Khi controller biet mot broker roi cluster( bang viec theo doi relevant Zookeeper path). Controller se biet tat ca cac partition duoc lead boi broker nay can mot leader moi. Producer va consumer se bat dau voi leader moi.
 
-- 
+    - The controller use `epoch number` to prevent a `split brain` where two node belive each is the current controller.
+
+- `Replication`: there are two types of replicas:
+    - `Leader replica`: moi partition co 1 replica duoc chi dinh la leader. Tat ca request produce va consume di qua leader nay. Dam bao tinh `consisteny` cua du lieu.
+    - `Follower replica`: Tat ca cac replica cua partion ko phai leader deu la followers. Cac followers khong phuc vu request, nhiem vu cua chung la giu ban sao, va cap nhat message tu leader. Khi leader crash 1 trong cac follower se tro thanh leader moi cua partition.
+
+    - `Leader replica` se biet `followers` dang cap nhat data tu leader den dau. Neu sao 10 seconds follower ko request data hoac khong bat kip mess moi nhat trong 10s, follower co replica `out of sync`. Neu follower ko bat kip leader no ko the tro thanh leader moi trong truong hop leader cu failed.
+
+    - Nguoc lai follower luon cap nhat message moi nhat goi la `in-sync replica`. Chi co follower nhu nay du dieu kien de binh bau leader cua partition.
+
+    - `replica.lag.time.max.ms` la khoang thoi gian mot replica bi coi la `out-of-sync` neu no inactive hoac bi bo lai phia sau.
+
+### Request processing
+
+- Kafka client user request: `metadata request` de biet broker nao la leader cua partition Kafka client ( producer, consumer) dang muon doc ghi.
+
+- Figure 5-2 Client routing request
+
+### Produce Requests
+
+### Fetch request
+
+- Figure 5-3: Broker delaying response until enough data accumulated. 
+- Neu consumer request message tu leader. Khong phai tat ca message ready trong leader duoc gui. Message den leader nhung chua duoc ghi len tat ca replica set `in-sync` thi se chua duoc reponse cho comsumer. Neu consumer request no se nhan mot empty response thay vi error.
+
+- Ly do cho viec nay: message chua duoc replica duoc xem la `unsafe`. 
+
+- Figure 5-4: Consumers only see message that were replicated to `in-sync` replicas
+
+
+### Other requests
+
+- Nen upgrade broker truoc khi upgrade client. Ly do broker biet handle version cu con client thi ko.
