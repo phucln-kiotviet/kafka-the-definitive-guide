@@ -205,4 +205,37 @@ docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' zook
 
 ### Configuring Consumers
 
+- `fetch.min.bytes`: luong data nho nhat consumer muon nhan tu broker.
+- `fetch.max.wait.ms`: `fetch.min.bytes` noi broker cho` toi khi du thi gui. `fetch.max.wait.ms` kiem soat thoi gian cho trong bao lau. Default 500ms. `fetch.min.bytes` or `fetch.max.wait.ms` whichever happens first broker will sent data to consumer.
+
+- `max.partition.fetch.bytes`: so luong bytes lon nhat ma broker se tra per partition. Can luu y khi set tham so nay, lon qua consumer mat nhieu thoi gian xu ly co the lam qua thoi gian polling -> rebalance. Default gia tri 1MB.
+
+- `session.timeout.ms`: Default 3s. Bao lau consumer ko can lien lac voi broker. Config nay di lien voi: `heartbeat.interval.ms`. `heartbeat.interval.ms` bao lau consumer se gui heartbeat, `session.timeout.ms` bao lau consumer ko can gui heartbeats van duoc tinh alive. Thuong `heartbeat.interval.ms` bang 1/3 so voi `session.timeout.ms`. -> `heartbeat.interval.ms` default 1s.
+
+- `auto.offset.reset`: `lastest` thi bi thieu, `earliest` thi bi thua.
+
+- `enable.auto.commit`: Default true. Neu la true thi cung se quan tam bao lau thi nen tu commit: `auto.commit.interval.ms`
+
+- `partition.assignment.strategy`: Cach partition duoc asign vao consume
+    - `range`: Chia khoang
+    - `roundrobin`: 
+- `client.id`: just a string
+
+- `max.poll.records`: max number of message in single call.
+
+### Commits and Offsets
+
+- Figure 4-6. Re-proccessed messages
+
+
+### Rebalance Listeners
+
+### Deserializers
+
+- 1 so thu chua can neu lam devops :up-hand:
+- deserialzers hay single consumer, custom commit and offset.
+
+
+## Chapter 5 kafka internals
+
 - 
