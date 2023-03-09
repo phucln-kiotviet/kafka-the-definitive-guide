@@ -173,3 +173,36 @@ docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' zook
 - Implementing a custom partitioning strategy.
 
 ## Chapter 4 Kafka consumers: Reading Data from Kafka
+
+### Kafka consumer concepts
+
+- `Consumer` and `consumer groups`: 
+    - Kafka consumer are typically part of a consumer group.
+    - So luong consumer trong Consumer group neu lon hon so luong partition thi phan lon hon se idle. ( cung luc chi co 1 consumer xu ly 1 partition). 
+    - 1 partition cung luc co de duoc doc (read) boi 2 consumer group khac nhau.
+- Consumer Groups and `Partition Rebalance`:
+    - Mot consumer thuoc 1 group doc message tu 1 partition duoc coi nhu quyen so huu(ownership). Viec chuyen quyen so huu(chuyen tu consumer A sang consumer B doc message tu partition P) duoc goi la rebalance.
+    - Rebalance co the xay ra trong 2 truong hop:
+        - Them partition
+        - Consumer duoc them hoac consumer bi crash
+
+    - During a rebalance, consumer can't consume messages.
+
+    - Cach consumer duy tri thanh vien trong consumer group va quyen so huu partition duoc gan toi chung la gui `heartbeats` toi Kafaka broker duoc chi dinh nhu `group cordinator`( this broker can different for different consumer groups). After few second does not receive heartbeat from consumer. Group coordinator will trigger rebalance.
+
+    - `livelock`: khoang thoi gian bao lau app khong xu ly message ma ko bi trigger reblance hay bi tinh roi group. Khac voi `session.timeout.ms` khoang thoi gian consumer bi tinh crash hoac stop viec gui heartbeats.
+
+    - Kafka version > 0.10.1 neu consumer xu ly message mat nhieu thoi gian don gian cau hinh: `max.poll.interval.ms`
+    - Consumer gui message JoinGroup dau tien den `group conrdinator` se la `group leader`. Leader nay sau do nhan full list consumer. Leader gan consumer va partition tuong ung gui lai group cordinator. Consumer chi biet partition ma no so huu. Leader la consumer voi full list consumer-partition. Qua trinh nay dien ra moi lan rebalance
+
+### Create kafka consumer
+
+### Subscribing to topics
+
+### Poll loop
+
+- `Thread Safety`: one consumer - one thread
+
+### Configuring Consumers
+
+- 
