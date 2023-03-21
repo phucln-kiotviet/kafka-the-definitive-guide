@@ -303,3 +303,17 @@ docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' zook
 
 ## Chapter 6 Reliable Data Delivery
 
+### Reliability Guarantees
+
+### Replication
+
+-  Replication is core of all Kafka's reliability guarantees.
+
+- A replica is considered `in-sync` if it is the leader for a partition, or if it is a follower that:
+    - Co active session voi Zookeeper (sent heartbeat toi Zookeeper trong 6 giay gan day)
+    - Lay message tu leader trong 10 giay gan day(co the cau hinh)
+    - Lay message moi nhat tu leader trong 10 giay gan day.
+
+- `out-of-sync` replicas: neu mot replica `in-sync` va `out-sync` lien tuc -> kha chac cau hinh cluster co gi do sai.
+
+### Broker Configuration
