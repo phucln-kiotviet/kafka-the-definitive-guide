@@ -277,3 +277,29 @@ docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' zook
 ### Other requests
 
 - Nen upgrade broker truoc khi upgrade client. Ly do broker biet handle version cu con client thi ko.
+
+
+### Physical Storage
+
+#### Partition Allocation:
+- Assign partition vao broker ko dua tren dung luong san co cua broker, ma no dua tren so luong partition. Can can trong van de nay khi he thong co cac broker moi va cu ( -> dung luong (free diskspace) la khac nhau)
+
+#### File Management
+
+- The segment chung ta dang ghi vao duoc goi la mot `active segment`. `Active segment` khong bao gio bi xoa vi vay neu de `retention` 1 ngay, nhung moi segment chua data cua 5 ngay thuc te ban dang luu data 5 ngay.
+
+#### File format
+
+- Nen dung cung mot dinh dang file cho ca producer, broker va consumer.
+
+#### Indexes
+
+- De nhanh chong truy cap vao bat cu offset nao consumer muon, kafka danh index cho cac segment va ko co checksum. sai di danh index lai.
+
+#### Compaction
+- Figure 5-8: Partition segment before and after compaction
+
+#### Deleted Events
+
+## Chapter 6 Reliable Data Delivery
+
