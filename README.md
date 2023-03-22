@@ -317,3 +317,17 @@ docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' zook
 - `out-of-sync` replicas: neu mot replica `in-sync` va `out-sync` lien tuc -> kha chac cau hinh cluster co gi do sai.
 
 ### Broker Configuration
+
+#### Replication Factor
+
+- Top level configuration is `replication.factor` 
+
+#### Unclean leader election
+
+- This config only avai on broker level.
+- `unclean leader election` enable: neu leader down cho phep mot `out-sync` replica len lam leader. Neu set false -> cho leader back to online.
+
+
+#### minimum `in-sync` replicas
+
+- Both level topic and broker level: `min.insync.replicas`
