@@ -331,3 +331,44 @@ docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' zook
 #### minimum `in-sync` replicas
 
 - Both level topic and broker level: `min.insync.replicas`
+
+### Using producers in a reliable system
+
+- Producers cung can cau hinh dung de support broker trong viec reliable
+
+#### Send acknowledgements
+
+- `acks=0` is very fast ( why a lot of benchmarks with this configuration) but chac chan se mat message neu chon cac nay.
+
+- `acks=1`: 
+
+- `acks=all`: safest option - the producer won't stop trying to send the message before it is fully committed. But also the slowest option.
+
+
+#### Configuring producer retries
+
+- Some error retriable error: `LEADER_NOT_AVAILABLE` but some other error is nonretriable error: `INVALID_CONFIG`
+
+- 1 so message duplicate la binh thuong( `idempotent`) vi du `Account value is 110$`. Nhung message sau duplicate ko binh thuong: `Add $10 to the account`
+
+#### additional error handling
+
+
+
+### Using Consumers in a Reliable System
+
+- Message den consumer chac chan da duoc replica. => viec duy nhat consumer lam de dam bao tinh reliable la theo doi message nao thi can doc, message nao ko.
+
+- Cach duy nhat mat message la consumer doc message va dang xu ly thi crash. -> can than voi viec commit `offset`
+
+- `committed message` different with `committed offsets`
+
+### Important Consumer Configuration Properties for Reliable Processing
+
+- `group.id`:
+
+- `auto.offset.reset`
+
+- `enable.auto.commit`: This is big decision
+
+- `auto.commit.interval.ms`: 
